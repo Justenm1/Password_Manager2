@@ -4,20 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ddbd4645-4419-4514-8e44-bd49b3705ed8" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="ddbd4645-4419-4514-8e44-bd49b3705ed8" name="Changes" comment="Removed app.config['user'] at end of db.classes. I am not trying to create a sequencial order of password_entry id's, but to link each password entry to an individual user. However, this is bringing an issue to light for registering new users and new entries. The error message that occurs says that the key must be bit-like.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/db_Classes.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/db_Classes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/globals.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/globals.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/helpers.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/helpers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/secrets.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/secrets.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/content.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/content.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/create_user_entry.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/create_user_entry.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/layout.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/layout.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/login.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/register.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/register.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -122,8 +111,17 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1713803106020</updated>
-      <workItem from="1713803107038" duration="21549000" />
+      <workItem from="1713803107038" duration="24851000" />
     </task>
+    <task id="LOCAL-00001" summary="Removed app.config['user'] at end of db.classes. I am not trying to create a sequencial order of password_entry id's, but to link each password entry to an individual user. However, this is bringing an issue to light for registering new users and new entries. The error message that occurs says that the key must be bit-like.">
+      <option name="closed" value="true" />
+      <created>1713893043936</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1713893043937</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -139,6 +137,10 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Removed app.config['user'] at end of db.classes. I am not trying to create a sequencial order of password_entry id's, but to link each password entry to an individual user. However, this is bringing an issue to light for registering new users and new entries. The error message that occurs says that the key must be bit-like." />
+    <option name="LAST_COMMIT_MESSAGE" value="Removed app.config['user'] at end of db.classes. I am not trying to create a sequencial order of password_entry id's, but to link each password entry to an individual user. However, this is bringing an issue to light for registering new users and new entries. The error message that occurs says that the key must be bit-like." />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Password_Manager2$app.coverage" NAME="app Coverage Results" MODIFIED="1713892741837" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />

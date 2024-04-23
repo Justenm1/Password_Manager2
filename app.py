@@ -5,7 +5,7 @@ from socket import gethostname
 from flask import render_template, session, redirect, url_for, request, flash
 
 from modules.globals import app, db
-from modules.helpers import logged_in, create_session, verify_pw
+from modules.helpers import logged_in, create_session, verify_pw, hash_pw
 from modules.db_Classes import Credentials, UserEntryCloud
 
 @app.route('/')
