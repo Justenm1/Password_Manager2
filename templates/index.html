@@ -32,14 +32,12 @@
     <table id="user_entries_table" class="table table-striped table-hover" >
         <tbody>
         {% for entries in userentries %}
-            <tr id="{{ entries.user_id }}">
 
+            <tr id="{{ entries.user_id }}">
                 <td class="border-end border-start-0 border-top-0 border-bottom-0">{{ entries.site_name }}</td>
                 <td class="border-end border-start-0 border-top-0 border-bottom-0">{{ entries.site_username }}</td>
-
-                {% if session['role'] == 'R' %}
                 <td class="border-end border-start-0 border-top-0 border-bottom-0">{{ entries.site_password }}</td>
-                {% endif %}
+
 
             </tr>
         {% endfor %}

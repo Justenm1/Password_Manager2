@@ -79,11 +79,12 @@ def encrypt(data, iv=None):
     # use the flask secret for the secret key
     from modules.secrets import flask_secret
 
+
     # format the iv to a 16 byte string
     if iv:
         iv = pad(str(iv).encode('utf-8'), 16, False)
     else:
-        iv = pad(str(app.config['patients']).encode('utf-8'), 16, False)
+        iv = pad(str(data).encode('utf-8'), 16, False)
 
     # create a cipher object using the key and iv
     cipher = Cipher(algorithms.AES(flask_secret), modes.CBC(iv))

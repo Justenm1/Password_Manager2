@@ -16,10 +16,6 @@ app = Flask(__name__, template_folder='../templates', static_folder="../static")
 app.config["DEBUG"] = True
 app.secret_key = flask_secret
 
-# query completeness configuration
-app.config['patients'] = 0
-app.config['fake_rate'] = 5  # 1 in every n patients will be fake
-
 # database configuration
 SQLALCHEMY_DATABASE_URI = "sqlite:///secure_database.sqlite3"
 

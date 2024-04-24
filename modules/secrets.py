@@ -1,3 +1,2 @@
 
-
-flask_secret = "justensecret"
+flask_secret = b"informationsecur"

@@ -4,9 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ddbd4645-4419-4514-8e44-bd49b3705ed8" name="Changes" comment="Removed app.config['user'] at end of db.classes. I am not trying to create a sequencial order of password_entry id's, but to link each password entry to an individual user. However, this is bringing an issue to light for registering new users and new entries. The error message that occurs says that the key must be bit-like.">
+    <list default="true" id="ddbd4645-4419-4514-8e44-bd49b3705ed8" name="Changes" comment="imported hash_pw to app.py">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/db_Classes.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/db_Classes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/globals.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/globals.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/helpers.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/helpers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/secrets.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/secrets.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/index.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -19,6 +24,17 @@
         <option value="HTML File" />
         <option value="Python Script" />
       </list>
+    </option>
+  </component>
+  <component name="FlaskConsoleOptions" custom-start-script="import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\nApp: %s [%s]\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))">
+    <envs>
+      <env key="FLASK_APP" value="app" />
+    </envs>
+    <option name="myCustomStartScript" value="import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\nApp: %s [%s]\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))" />
+    <option name="myEnvs">
+      <map>
+        <entry key="FLASK_APP" value="app" />
+      </map>
     </option>
   </component>
   <component name="Git.Settings">
@@ -39,6 +55,16 @@
   "selectedUrlAndAccountId": {
     "url": "https://github.com/Justenm1/Password_Manager2.git",
     "accountId": "a063c393-c704-4265-aee4-86b0b550502f"
+  },
+  "recentNewPullRequestHead": {
+    "server": {
+      "useHttp": false,
+      "host": "github.com",
+      "port": null,
+      "suffix": null
+    },
+    "owner": "Justenm1",
+    "repository": "Password_Manager2"
   }
 }]]></component>
   <component name="ProjectColorInfo"><![CDATA[{
@@ -56,7 +82,7 @@
     "Python.app.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "justen's-branch",
+    "git-widget-placeholder": "#1 on justen's-branch",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -111,7 +137,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1713803106020</updated>
-      <workItem from="1713803107038" duration="24851000" />
+      <workItem from="1713803107038" duration="36501000" />
     </task>
     <task id="LOCAL-00001" summary="Removed app.config['user'] at end of db.classes. I am not trying to create a sequencial order of password_entry id's, but to link each password entry to an individual user. However, this is bringing an issue to light for registering new users and new entries. The error message that occurs says that the key must be bit-like.">
       <option name="closed" value="true" />
@@ -121,7 +147,15 @@
       <option name="project" value="LOCAL" />
       <updated>1713893043937</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="imported hash_pw to app.py">
+      <option name="closed" value="true" />
+      <created>1713915246143</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1713915246145</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -140,9 +174,10 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Removed app.config['user'] at end of db.classes. I am not trying to create a sequencial order of password_entry id's, but to link each password entry to an individual user. However, this is bringing an issue to light for registering new users and new entries. The error message that occurs says that the key must be bit-like." />
-    <option name="LAST_COMMIT_MESSAGE" value="Removed app.config['user'] at end of db.classes. I am not trying to create a sequencial order of password_entry id's, but to link each password entry to an individual user. However, this is bringing an issue to light for registering new users and new entries. The error message that occurs says that the key must be bit-like." />
+    <MESSAGE value="imported hash_pw to app.py" />
+    <option name="LAST_COMMIT_MESSAGE" value="imported hash_pw to app.py" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/Password_Manager2$app.coverage" NAME="app Coverage Results" MODIFIED="1713892741837" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Password_Manager2$app.coverage" NAME="app Coverage Results" MODIFIED="1713924345562" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
