@@ -1,10 +1,96 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'content.html' %} <!-- end admintools.html -->
+
+{% set active_page = 'index' %}
+
+{% block title %}User Passwords{% endblock %}
+
+{% block page_content %}
+
+    <!-- datatables.net css -->
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/fixedcolumns/4.3.0/css/fixedColumns.bootstrap5.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/fixedheader/3.4.0/css/fixedHeader.bootstrap5.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/scroller/2.2.0/css/scroller.bootstrap5.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/select/1.7.0/css/select.dataTables.min.css" rel="stylesheet">
+
+    <h1>User Entries</h1>
+
+        <div class="container mb-4">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show d-flex align-items-center" role="alert">
+                    <p class="mb-0">{{ message }}.</p>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+        </div>
+
+    <table id="user_entries_table" class="table table-striped table-hover" >
+        <tbody>
+        {% for entries in userentries %}
+
+            <tr id="{{ entries.user_id }}">
+                <td class="border-end border-start-0 border-top-0 border-bottom-0">{{ entries.site_name }}</td>
+                <td class="border-end border-start-0 border-top-0 border-bottom-0">{{ entries.site_username }}</td>
+                <td class="border-end border-start-0 border-top-0 border-bottom-0">{{ entries.site_password }}</td>
+
+
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+
+
+    <!-- datatables.net -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/fixedcolumns/4.3.0/js/dataTables.fixedColumns.min.js"></script>
+    <script src="https://cdn.datatables.net/fixedheader/3.4.0/js/dataTables.fixedHeader.min.js"></script>
+    <script src="https://cdn.datatables.net/scroller/2.2.0/js/dataTables.scroller.min.js"></script>
+    <script src="https://cdn.datatables.net/select/1.7.0/js/dataTables.select.min.js"></script>
+
+    <script>
+
+        // script to generate fancy table
+        let patient_table = new DataTable('#user_entries_table', {
+            dom: '<Bif<t>>',
+            buttons: ['showSelected'],
+            {% if session['role'] == 'H' %}fixedColumns: true, {% endif %}
+            fixedHeader: true,
+            scrollX: true,
+            scrollY: '53vh', // '45vh'
+            scroller: {
+                displayBuffer: 100,
+            },
+            scrollCollapse: true,
+            stateSave: true,
+            select: true,
+            order: [[1, 'asc']],
+            columns: [
+                {title: 'site_name'},
+                {title: 'site_username'},
+                {% if session['role'] == 'R' %}
+                {title: 'site_password'},
+                {% endif %}
+            ],
+
+            initComplete: function () {
+                // tooltip code
+                let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                let tooltipList = tooltipTriggerList.map(function (element) {
+                    return new bootstrap.Tooltip(element);
+                });
+            }
+        });
+
+    </script>
+
+{% endblock %}

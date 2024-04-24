@@ -1,10 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'layout.html' %} <!-- end layout.html -->
+
+{% block content %}
+
+    <div class="row flex-grow-1">
+        <div class="col justify-content-center align-items-center h-100 gx-5">
+            <div class="card bg-body-secondary border-0 shadow-2-strong" style="border-radius: 1rem;"> <!-- height:100%; width: 100%; -->
+                <div class="card-body p-4 text-center">
+
+                    {% block page_content %}{% endblock %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

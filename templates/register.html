@@ -1,10 +1,63 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'access.html' %} <!-- end access.html -->
+
+{% set active_page = 'register' %}
+
+{% block title %}Register{% endblock %}
+
+{% block access %}
+
+    <div class="btn-group mb-4" style="width:100%;">
+        <a href="{{ url_for('login', redirect_to=request.args.get('redirect_to', '/')) }}" class="btn">Log In</a>
+        <a href="{{ request.full_path }}" class="btn active">Register</a>
+    </div>
+
+    <form action="{{ request.full_path }}"
+          method="post" autocomplete="off"
+          class="needs-validation"
+          novalidate>
+
+        <div class="form-outline input-group has-validation mb-4">
+            <span class="input-group-text">Username</span>
+            <input type="text"
+                   name="username"
+                   class="form-control"
+                   id="username"
+                   autofocus required>
+            <div class="invalid-feedback">Please enter a valid email address</div>
+        </div>
+
+        <div class="form-outline input-group has-validation mb-4">
+            <span class="input-group-text">Password</span>
+            <input type="password"
+                   name="password1"
+                   class="form-control"
+                   id="password1"
+                   required>
+            <div class="invalid-feedback">Please enter a password</div>
+        </div>
+
+        <div class="form-outline input-group has-validation mb-4">
+            <span class="input-group-text">Password</span>
+            <input type="password"
+                   name="password2"
+                   class="form-control"
+                   id="password2"
+                   required>
+            <div class="invalid-feedback">Please re-enter the password</div>
+        </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show d-flex align-items-center" role="alert">
+                    <p class="mb-0">{{ message }}.</p>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+        <button type="submit" class="btn btn-outline-secondary">Register</button>
+    </form>
+
+{% endblock %}
