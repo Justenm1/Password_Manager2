@@ -31,16 +31,26 @@
 
     <table id="user_entries_table" class="table table-striped table-hover" >
         <tbody>
-        {% for entries in userentries %}
+        {% if rolecheck == 'H' %}
+            {% for entries in userentries %}
+                <tr id="{{ entries.user_id }}">
+                    <td class="border-end border-start-0 border-top-0 border-bottom-0">{{ entries.site_name }}</td>
+                    <td class="border-end border-start-0 border-top-0 border-bottom-0">{{ entries.site_username }}</td>
+                    <td class="border-end border-start-0 border-top-0 border-bottom-0">{{ entries.site_password }}</td>
+                </tr>
+            {% endfor %}
+        {% else %}
+              {% for entry in userentries %}
+                    {% if entry.user_id == session['id'] %}
+                        <tr id="{{ entry.user_id }}">
+                            <td class="border-end border-start-0 border-top-0 border-bottom-0">{{ entry.site_name }}</td>
+                            <td class="border-end border-start-0 border-top-0 border-bottom-0">{{ entry.site_username }}</td>
+                            <td class="border-end border-start-0 border-top-0 border-bottom-0">{{ entry.site_password }}</td>
+                        </tr>
+                    {% endif %}
+            {% endfor %}
+        {% endif %}
 
-            <tr id="{{ entries.user_id }}">
-                <td class="border-end border-start-0 border-top-0 border-bottom-0">{{ entries.site_name }}</td>
-                <td class="border-end border-start-0 border-top-0 border-bottom-0">{{ entries.site_username }}</td>
-                <td class="border-end border-start-0 border-top-0 border-bottom-0">{{ entries.site_password }}</td>
-
-
-            </tr>
-        {% endfor %}
         </tbody>
     </table>
 
@@ -60,7 +70,7 @@
     <script>
 
         // script to generate fancy table
-        let patient_table = new DataTable('#user_entries_table', {
+        let user_entries_table = new DataTable('#user_entries_table', {
             dom: '<Bif<t>>',
             buttons: ['showSelected'],
             {% if session['role'] == 'H' %}fixedColumns: true, {% endif %}
@@ -77,9 +87,8 @@
             columns: [
                 {title: 'site_name'},
                 {title: 'site_username'},
-                {% if session['role'] == 'R' %}
                 {title: 'site_password'},
-                {% endif %}
+
             ],
 
             initComplete: function () {

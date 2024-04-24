@@ -5,7 +5,7 @@ from socket import gethostname
 from flask import render_template, session, redirect, url_for, request, flash
 
 from modules.globals import app, db
-from modules.helpers import logged_in, create_session, verify_pw, hash_pw, encrypt
+from modules.helpers import logged_in, create_session, verify_pw, hash_pw, encrypt, decrypt
 from modules.db_Classes import Credentials, UserEntryCloud
 
 @app.route('/')
@@ -24,8 +24,13 @@ def index():
     cloud_query = db.session.execute(db.select(UserEntryCloud)).scalars().all()
 
     rolecheck = session['role']
+    idcheck = session['id']
 
-    return render_template('index.html', rolecheck=rolecheck, session=session, userentries=cloud_query)
+    return render_template('index.html',
+                           rolecheck=rolecheck,
+                           idcheck=idcheck,
+                           session=session,
+                           userentries=cloud_query)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
