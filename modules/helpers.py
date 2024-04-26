@@ -1,8 +1,10 @@
 from flask import session
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-from modules.globals import app, db
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import pad, unpad
+from Crypto.Random import get_random_bytes
+from modules.globals import app
 
 
 def create_session(user_id, user, role):
@@ -23,7 +25,7 @@ def hash_pw(password):
 
     # returns a 16 byte hash value for the password
     # encoded with the salt and other parameters
-    return argon2.hash(password)
+    return str.encode(argon2.hash(password))
 
 
 def verify_pw(pw_hash, password):
@@ -47,85 +49,49 @@ def logged_in():
     """
     return 'logged_in' in session
 
-def pad(data, length=32, add_code=True):
-    """ pad data to a multiple of the specified length.
-        if add_code is true, the pad length is encoded
-        with the data. returns the padded data
-    """
 
-    # calculate required length of padding
-    k = len(data)
-    if k % length > 0:
-        pad_length = (k // length + 1) * length - k
-    else:
-        pad_length = 0
-
-    # add the padding to the data
-    data += b"#" * pad_length
-
-    if add_code:
-        # encode the pad length with the data
-        pad_code = bytes(chr(ord("A") + pad_length).encode("utf-8"))
-        data = data + b"*" * (length - 1) + pad_code
-
-    return data
-
-
-def encrypt(data, iv=None):
+def encrypt(data):
     """ encrypt data using AES in CBC mode with a 16 byte
         initialization vector. returns the ciphertext
     """
-
-    # use the flask secret for the secret key
-    from modules.secrets import flask_secret
-
-
-    # format the iv to a 16 byte string
-    if iv:
-        iv = pad(str(iv).encode('utf-8'), 16, False)
-    else:
-        iv = pad(str(data).encode('utf-8'), 16, False)
-
-    # create a cipher object using the key and iv
-    cipher = Cipher(algorithms.AES(flask_secret), modes.CBC(iv))
-
-    # prepare the cleartext for encryption
-    cleartext = pad(data.encode('utf-8'), 16)
-
-    # create an encryptor object
-    encryptor = cipher.encryptor()
-
-    # encrypt the padded cleartext
-    return encryptor.update(cleartext) + encryptor.finalize()
+    key = str.encode('informationsecurinformationsecur')  # 32 bytes key
+    dataforpadding = data.encode('utf-8')
+    iv = get_random_bytes(16)
+    print(iv)
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+    print(cipher.iv)
+    cipher_text = cipher.encrypt(pad(dataforpadding, AES.block_size))
+    print(cipher_text)
+    return cipher_text, iv
 
 
-def decrypt(data, iv):
+def decrypt(cipher_text, iv):
     """ decrypt data using AES in CBC mode with a 16 byte
         initialization vector. returns the cleartext
     """
 
     # use the flask secret for the secret key
-    from modules.secrets import flask_secret
+    key = str.encode('informationsecurinformationsecur')
 
-    # create the iv from the patient tuple's patient_id
-    iv = pad(str(iv).encode('utf-8'), 16, False)
+    decrypt_cipher = AES.new(key, AES.MODE_CBC, iv)
 
-    # create a cipher object using the key and iv
-    cipher = Cipher(algorithms.AES(flask_secret), modes.CBC(iv))
-
-    # create a decryptor object
-    decryptor = cipher.decryptor()
-
-    # decrypt the ciphertext
-    decipher_text = decryptor.update(data) + decryptor.finalize()
-
-    # remove the pad code block from the deciphered text
-    pad_block = decipher_text[-16:]  # get the pad code block
-    clear_text = decipher_text[:-16]  # remove the pad code block
-
-    # remove the padding from the deciphered text using the pad code
-    pad_code = pad_block[-1] - ord("A")  # get the pad code
-    clear_text = clear_text[:-pad_code]  # remove the padding
+    plain_text = unpad(decrypt_cipher.decrypt(cipher_text), AES.block_size)
 
     # return the deciphered text as a utf-8 string
-    return clear_text.decode("utf-8")
+    return plain_text
+
+def decryptentry(cipher_text, iv):
+    """ decrypt data using AES in CBC mode with a 16 byte
+        initialization vector. returns the cleartext
+    """
+
+    # use the flask secret for the secret key
+    key = str.encode('informationsecurinformationsecur')
+    texttodecrypt = cipher_text.encode('utf-8')
+    byteiv = iv.encode('utf-8')
+    decrypt_cipher = AES.new(key, AES.MODE_CBC, byteiv)
+
+    encoded_text = unpad(decrypt_cipher.decrypt(texttodecrypt), AES.block_size)
+    plain_text = str(encoded_text, 'utf-8')
+    # return the deciphered text as an utf-8 string
+    return plain_text

@@ -10,8 +10,8 @@ from modules.helpers import hash_pw
 from sqlalchemy import String, ForeignKey, LargeBinary
 from sqlalchemy.orm import Mapped, mapped_column, registry
 
-cloud_db = registry(metadata=db.metadatas[None])
 
+cloud_db = registry(metadata=db.metadatas[None])
 
 
 @cloud_db.mapped_as_dataclass()
@@ -24,8 +24,9 @@ class Credentials:
 
     user_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, init=False)
     username: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
-    password: Mapped[str] = mapped_column(String(50), nullable=False)
+    password: Mapped[str] = mapped_column(LargeBinary, nullable=False)
     role: Mapped[str] = mapped_column(ForeignKey("role.role_name"), nullable=False)
+    iv: Mapped[str] = mapped_column(LargeBinary, nullable=False)
 
 
 @cloud_db.mapped_as_dataclass()
@@ -53,7 +54,7 @@ class UserEntryCloud:
     site_name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
     site_username: Mapped[str] = mapped_column(String(50), nullable=False)
     site_password: Mapped[str] = mapped_column(LargeBinary, nullable=False)
-
+    iv: Mapped[str] = mapped_column(LargeBinary, nullable=False)
 
 app.logger.info("administrative: (4) database tables configured")
 
@@ -66,7 +67,7 @@ with app.app_context():
         db.session.add_all([
             Role(role_name="H"),  # can access all fields of UserEntries, but not passwords
             Role(role_name="R"),  # can access all fields of UserEntries
-            Credentials(username="admin", password=hash_pw("test"), role="H"),
-            Credentials(username="user", password=hash_pw("test"), role="R"),
+            Credentials(username="admin", password=hash_pw("test"), role="H", iv="testiv".encode("utf-8")),
+            Credentials(username="user", password=hash_pw("test"), role="R", iv="testiv2".encode("utf-8")),
         ])
     db.session.commit()

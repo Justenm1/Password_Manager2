@@ -1,2 +1,5 @@
+key = "informationsecurinformationsecur"
 
-flask_secret = b"informationsecur"
+
+
+
