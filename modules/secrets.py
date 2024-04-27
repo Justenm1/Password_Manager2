@@ -1,2 +1,5 @@
+key = "informationsecurinformationsecur".encode("utf-8")
 
-flask_secret = b"informationsecur"
+
+
+

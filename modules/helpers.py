@@ -1,9 +1,8 @@
 from flask import session
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
+from modules.globals import app
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-from modules.globals import app, db
-
 
 def create_session(user_id, user, role):
     """ Create a session for the user
@@ -23,7 +22,7 @@ def hash_pw(password):
 
     # returns a 16 byte hash value for the password
     # encoded with the salt and other parameters
-    return argon2.hash(password)
+    return str.encode(argon2.hash(password))
 
 
 def verify_pw(pw_hash, password):
@@ -47,11 +46,17 @@ def logged_in():
     """
     return 'logged_in' in session
 
-def pad(data, length=32, add_code=True):
+
+def increment_entry_count():
+    # increment global patients counter
+    app.config['entries'] += 1
+
+
+def mypad(data, length=32, add_code=True):
     """ pad data to a multiple of the specified length.
-        if add_code is true, the pad length is encoded
-        with the data. returns the padded data
-    """
+            if add_code is true, the pad length is encoded
+            with the data. returns the padded data
+        """
 
     # calculate required length of padding
     k = len(data)
@@ -75,22 +80,19 @@ def encrypt(data, iv=None):
     """ encrypt data using AES in CBC mode with a 16 byte
         initialization vector. returns the ciphertext
     """
-
-    # use the flask secret for the secret key
-    from modules.secrets import flask_secret
-
+    from modules.secrets import key  # 32 bytes key
 
     # format the iv to a 16 byte string
     if iv:
-        iv = pad(str(iv).encode('utf-8'), 16, False)
+        iv = mypad(str(iv).encode('utf-8'), 16, False)
     else:
-        iv = pad(str(data).encode('utf-8'), 16, False)
+        iv = mypad(str(app.config['entries']).encode('utf-8'), 16, False)
 
     # create a cipher object using the key and iv
-    cipher = Cipher(algorithms.AES(flask_secret), modes.CBC(iv))
+    cipher = Cipher(algorithms.AES(key), modes.CBC(iv))
 
     # prepare the cleartext for encryption
-    cleartext = pad(data.encode('utf-8'), 16)
+    cleartext = mypad(data.encode('utf-8'), 16)
 
     # create an encryptor object
     encryptor = cipher.encryptor()
@@ -105,27 +107,30 @@ def decrypt(data, iv):
     """
 
     # use the flask secret for the secret key
-    from modules.secrets import flask_secret
+    from modules.secrets import key
 
-    # create the iv from the patient tuple's patient_id
-    iv = pad(str(iv).encode('utf-8'), 16, False)
+    if session['role'] == 'H':
+        return data
+    else:
+        # create the iv from the patient tuple's patient_id
+        iv = mypad(str(iv).encode('utf-8'), 16, False)
 
-    # create a cipher object using the key and iv
-    cipher = Cipher(algorithms.AES(flask_secret), modes.CBC(iv))
+        # create a cipher object using the key and iv
+        cipher = Cipher(algorithms.AES(key), modes.CBC(iv))
 
-    # create a decryptor object
-    decryptor = cipher.decryptor()
+        # create a decryptor object
+        decryptor = cipher.decryptor()
 
-    # decrypt the ciphertext
-    decipher_text = decryptor.update(data) + decryptor.finalize()
+        # decrypt the ciphertext
+        decipher_text = decryptor.update(data) + decryptor.finalize()
 
-    # remove the pad code block from the deciphered text
-    pad_block = decipher_text[-16:]  # get the pad code block
-    clear_text = decipher_text[:-16]  # remove the pad code block
+        # remove the pad code block from the deciphered text
+        pad_block = decipher_text[-16:]  # get the pad code block
+        clear_text = decipher_text[:-16]  # remove the pad code block
 
-    # remove the padding from the deciphered text using the pad code
-    pad_code = pad_block[-1] - ord("A")  # get the pad code
-    clear_text = clear_text[:-pad_code]  # remove the padding
+        # remove the padding from the deciphered text using the pad code
+        pad_code = pad_block[-1] - ord("A")  # get the pad code
+        clear_text = clear_text[:-pad_code]  # remove the padding
 
-    # return the deciphered text as a utf-8 string
-    return clear_text.decode("utf-8")
+        # return the deciphered text as a utf-8 string
+        return clear_text.decode("utf-8")

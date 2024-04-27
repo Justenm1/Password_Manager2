@@ -5,8 +5,9 @@ from socket import gethostname
 from flask import render_template, session, redirect, url_for, request, flash
 
 from modules.globals import app, db
-from modules.helpers import logged_in, create_session, verify_pw, hash_pw, encrypt, decrypt
+from modules.helpers import (logged_in, create_session, verify_pw, hash_pw, encrypt)
 from modules.db_Classes import Credentials, UserEntryCloud
+
 
 @app.route('/')
 def index():
@@ -18,18 +19,16 @@ def index():
 
     app.logger.info('index: user at home page')
 
+
     if not logged_in():
         return redirect(url_for('login'))
 
     cloud_query = db.session.execute(db.select(UserEntryCloud)).scalars().all()
 
-    rolecheck = session['role']
-    idcheck = session['id']
+    for entry in cloud_query:
+        entry.decrypt()
 
-    return render_template('index.html',
-                           rolecheck=rolecheck,
-                           idcheck=idcheck,
-                           session=session,
+    return render_template('index.html', session=session,
                            userentries=cloud_query)
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -48,18 +47,20 @@ def login():
     if request.method == "POST":
 
         # check if the user exists in the database
-        account = db.session.execute(db.select(Credentials).where(Credentials.username == request.form['username'])).scalars().first()
+        account = db.session.execute(db.select(Credentials).where(
+            Credentials.username == request.form['username'])).scalars().first()
 
         if account is None:
             flash("Invalid credentials", "error")
-
         else:
             if verify_pw(account.password, request.form['password']):
-                create_session(account.user_id, account.username, account.role)
-                # flash("Successfully logged in", "success")
-                return redirect(url_for('index'))
+                    create_session(account.user_id, account.username, account.role)
+                    # flash("Successfully logged in", "success")
+                    return redirect(url_for('index'))
             else:
                 flash("Invalid credentials", "error")
+
+
 
     return render_template('login.html', session=session)
 
@@ -103,7 +104,8 @@ def register():
     if request.method == 'POST':
 
         # get account from database if it exists
-        account = db.session.execute(db.select(Credentials).where(Credentials.username == request.form['username'])).fetchone()
+        account = db.session.execute(db.select(Credentials).where(Credentials.username == request.form['username'])).scalars().first()
+
 
         if account is not None:
             flash("Account already exists", "error")
@@ -119,6 +121,7 @@ def register():
             create_session(user_id, request.form['username'], "R")
             # flash("Account created successfully", "success")
             redirect(url_for('index'))
+
 
     return render_template('register.html')
 
@@ -136,13 +139,13 @@ def create_user_entry():
         return redirect(url_for('login'))
 
     if request.method == "POST":
+
         new_entry = UserEntryCloud(
-            user_id =session['id'],
+            user_id=session['id'],
             site_name=request.form["site_name"],
             site_username=request.form["site_username"],
-            site_password=encrypt(request.form["site_password"]),
+            site_password=request.form["site_password"]
         )
-
         db.session.add(new_entry)
         db.session.commit()
         flash("Entry successfully added to database", "success")
