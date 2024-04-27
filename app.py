@@ -5,7 +5,7 @@ from socket import gethostname
 from flask import render_template, session, redirect, url_for, request, flash
 
 from modules.globals import app, db
-from modules.helpers import (logged_in, create_session, verify_pw, hash_pw, encrypt)
+from modules.helpers import logged_in, create_session, verify_pw, hash_pw
 from modules.db_Classes import Credentials, UserEntryCloud
 
 
@@ -19,16 +19,17 @@ def index():
 
     app.logger.info('index: user at home page')
 
-
     if not logged_in():
         return redirect(url_for('login'))
 
     cloud_query = db.session.execute(db.select(UserEntryCloud)).scalars().all()
 
+    rolecheck = session['role']
+
     for entry in cloud_query:
         entry.decrypt()
 
-    return render_template('index.html', session=session,
+    return render_template('index.html', rolecheck=rolecheck, session=session,
                            userentries=cloud_query)
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -54,13 +55,11 @@ def login():
             flash("Invalid credentials", "error")
         else:
             if verify_pw(account.password, request.form['password']):
-                    create_session(account.user_id, account.username, account.role)
-                    # flash("Successfully logged in", "success")
-                    return redirect(url_for('index'))
+                create_session(account.user_id, account.username, account.role)
+                # flash("Successfully logged in", "success")
+                return redirect(url_for('index'))
             else:
                 flash("Invalid credentials", "error")
-
-
 
     return render_template('login.html', session=session)
 

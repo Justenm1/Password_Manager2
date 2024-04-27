@@ -28,11 +28,6 @@ class Credentials:
     role: Mapped[str] = mapped_column(ForeignKey("role.role_name"), nullable=False)
 
 
-
-
-
-
-
 @cloud_db.mapped_as_dataclass()
 class Role:
     """ role table in the database that is
@@ -73,8 +68,6 @@ def entry_factory():
             self.site_username = site_username
             self.site_password = encrypt(str(site_password))
             self.user_id = user_id
-
-
 
     return EntryBase
 

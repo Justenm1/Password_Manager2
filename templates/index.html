@@ -34,6 +34,7 @@
         {% if rolecheck == 'H' %}
             {% for entries in userentries %}
                 <tr id="{{ entries.user_id }}">
+                    <td class="border-end border-start-0 border-top-0 border-bottom-0">{{ entries.entry_id + 1 }}</td>
                     <td class="border-end border-start-0 border-top-0 border-bottom-0">{{ entries.site_name }}</td>
                     <td class="border-end border-start-0 border-top-0 border-bottom-0">{{ entries.site_username }}</td>
                     <td class="border-end border-start-0 border-top-0 border-bottom-0">{{ entries.site_password }}</td>
@@ -53,7 +54,6 @@
 
         </tbody>
     </table>
-
 
 
     <!-- datatables.net -->
@@ -85,6 +85,7 @@
             select: true,
             order: [[1, 'asc']],
             columns: [
+                {title: 'entry_id'},
                 {title: 'site_name'},
                 {title: 'site_username'},
                 {title: 'site_password'},
