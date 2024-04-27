@@ -5,10 +5,9 @@ from socket import gethostname
 from flask import render_template, session, redirect, url_for, request, flash
 
 from modules.globals import app, db
-from modules.helpers import (logged_in, create_session, verify_pw, encrypt,
-                             decrypt)
+from modules.helpers import (logged_in, create_session, verify_pw, hash_pw, encrypt)
 from modules.db_Classes import Credentials, UserEntryCloud
-from sys import getsizeof
+
 
 @app.route('/')
 def index():
@@ -20,30 +19,16 @@ def index():
 
     app.logger.info('index: user at home page')
 
+
     if not logged_in():
         return redirect(url_for('login'))
 
     cloud_query = db.session.execute(db.select(UserEntryCloud)).scalars().all()
-    print(cloud_query)
-    entryids = db.session.execute(db.select(UserEntryCloud).where(
-        UserEntryCloud.user_id == session['id']))
-    for entry in entryids.scalars():
-        print(entry)
 
+    for entry in cloud_query:
+        entry.decrypt()
 
-    rolecheck = session['role']
-    idcheck = session['id']
-    print(rolecheck)
-    print(idcheck)
-
-
-
-
-
-    return render_template('index.html',
-                           rolecheck=rolecheck,
-                           idcheck=idcheck,
-                           session=session,
+    return render_template('index.html', session=session,
                            userentries=cloud_query)
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -67,25 +52,11 @@ def login():
 
         if account is None:
             flash("Invalid credentials", "error")
-        elif account.role == 'H':
-                if verify_pw(account.password, request.form['password']):
+        else:
+            if verify_pw(account.password, request.form['password']):
                     create_session(account.user_id, account.username, account.role)
                     # flash("Successfully logged in", "success")
                     return redirect(url_for('index'))
-        else:
-            passwordtodecrypt = db.session.execute(db.select(Credentials.password).where(
-                Credentials.username == request.form['username'])).scalars().first()
-            print(passwordtodecrypt)
-            ivtobeused = db.session.execute(db.select(Credentials.iv).where(
-                Credentials.username == request.form['username'])).scalars().first()
-            print(account.password)
-            print(account.iv)
-            print(getsizeof(account.iv))
-            print(ivtobeused)
-            if decrypt(passwordtodecrypt, ivtobeused) == str.encode(request.form['password']):
-                create_session(account.user_id, account.username, account.role)
-                # flash("Successfully logged in", "success")
-                return redirect(url_for('index'))
             else:
                 flash("Invalid credentials", "error")
 
@@ -141,13 +112,10 @@ def register():
         elif request.form['password1'] != request.form['password2']:
             flash("Passwords do not match", "error")
         else:
-            ciphertext, IV = encrypt(request.form['password1'])
-            print(IV)
             user_id = db.session.execute(db.insert(Credentials).values(
                 username=request.form['username'],
-                password=ciphertext,
-                role="R",
-                iv = IV
+                password=hash_pw(request.form['password1']),
+                role="R"
             )).inserted_primary_key[0]
             db.session.commit()
             create_session(user_id, request.form['username'], "R")
@@ -171,24 +139,16 @@ def create_user_entry():
         return redirect(url_for('login'))
 
     if request.method == "POST":
-        ciphertext, IV = encrypt(request.form['site_password'])
-        print(ciphertext)
-        print(IV)
-        print(request.form['site_password'])
 
-        new_entry = db.session.execute(db.insert(UserEntryCloud).values(
+        new_entry = UserEntryCloud(
             user_id=session['id'],
             site_name=request.form["site_name"],
             site_username=request.form["site_username"],
-            site_password=ciphertext,
-            iv=IV
-        )).inserted_primary_key[0]
+            site_password=request.form["site_password"]
+        )
+        db.session.add(new_entry)
         db.session.commit()
-        print(db.session.execute(db.select(UserEntryCloud.iv).where(UserEntryCloud.user_id == session['id'])).scalars().first())
         flash("Entry successfully added to database", "success")
-
-
-
 
     return render_template('create_user_entry.html')
 

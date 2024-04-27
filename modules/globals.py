@@ -13,8 +13,8 @@ print("administrative: (1) database initialized")
 
 # Flask configuration
 app = Flask(__name__, template_folder='../templates', static_folder="../static")
-app.config["DEBUG"] = True
 app.secret_key = key
+app.config['entries'] = 0
 
 
 # database configuration

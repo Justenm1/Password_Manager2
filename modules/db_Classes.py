@@ -6,10 +6,10 @@
 """
 
 from modules.globals import db, app
-from modules.helpers import hash_pw
-from sqlalchemy import String, ForeignKey, LargeBinary
+from modules.helpers import hash_pw, decrypt, encrypt, increment_entry_count
+from sqlalchemy import String, ForeignKey, LargeBinary, Integer
 from sqlalchemy.orm import Mapped, mapped_column, registry
-
+from typing import Optional
 
 cloud_db = registry(metadata=db.metadatas[None])
 
@@ -26,7 +26,11 @@ class Credentials:
     username: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(LargeBinary, nullable=False)
     role: Mapped[str] = mapped_column(ForeignKey("role.role_name"), nullable=False)
-    iv: Mapped[str] = mapped_column(LargeBinary, nullable=False)
+
+
+
+
+
 
 
 @cloud_db.mapped_as_dataclass()
@@ -41,20 +45,48 @@ class Role:
     role_name: Mapped[str] = mapped_column(String(1), primary_key=True)
 
 
+def entry_factory():
+    class EntryBase:
+        """ patient_info table in the database that is
+            designed to store patient information
+        """
+
+        __tablename__ = "User_Entries"
+
+        entry_id: Mapped[int] = mapped_column(primary_key=True, nullable=False)
+        site_name: Mapped[str] = mapped_column(String(50), nullable=False)
+        site_username: Mapped[str] = mapped_column(String(50), nullable=False)
+        site_password: Mapped[str] = mapped_column(LargeBinary, nullable=False)
+        user_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey('credentials.user_id'), nullable=True)
+
+        def decrypt(self):
+            "Decrypts the encrypted fields of the object"
+            self.site_password = decrypt(self.site_password, self.entry_id)
+
+        def __init__(self, site_name, site_username, site_password, user_id=None):
+            """ Base class ctor to create an entry in the database.
+                The passwords are encrypted before being stored in
+                the database to protect its confidentiality.
+                If user_id is provided, it associates the entry with that user."""
+            self.entry_id = app.config['entries']
+            self.site_name = site_name
+            self.site_username = site_username
+            self.site_password = encrypt(str(site_password))
+            self.user_id = user_id
+
+
+
+    return EntryBase
+
 @cloud_db.mapped_as_dataclass()
-class UserEntryCloud:
-    """ patient_info table in the database that is
-        designed to store patient information
-    """
+class UserEntryCloud(entry_factory()):
+    def __init__(self, site_name, site_username, site_password, user_id=None):
+        """Create a new entry in the database"""
 
-    __tablename__ = "User_Entries"
+        super().__init__(site_name, site_username, site_password, user_id)
 
-    user_id: Mapped[int] = mapped_column(ForeignKey("credentials.user_id"), nullable=False)
-    entry_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, init=False, unique=True, nullable=False)
-    site_name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
-    site_username: Mapped[str] = mapped_column(String(50), nullable=False)
-    site_password: Mapped[str] = mapped_column(LargeBinary, nullable=False)
-    iv: Mapped[str] = mapped_column(LargeBinary, nullable=False)
+        increment_entry_count()
+
 
 app.logger.info("administrative: (4) database tables configured")
 
@@ -67,7 +99,11 @@ with app.app_context():
         db.session.add_all([
             Role(role_name="H"),  # can access all fields of UserEntries, but not passwords
             Role(role_name="R"),  # can access all fields of UserEntries
-            Credentials(username="admin", password=hash_pw("test"), role="H", iv="testiv".encode("utf-8")),
-            Credentials(username="user", password=hash_pw("test"), role="R", iv="testiv2".encode("utf-8")),
+            Credentials(username="admin", password=hash_pw("test"), role="H"),
+            Credentials(username="user", password=hash_pw("test"), role="R"),
+            UserEntryCloud(site_name="Facebook.com", site_username="adminusername", site_password="facebook".encode('utf-8')),
         ])
+    else:
+        app.config['entries'] = db.session.execute(db.select(UserEntryCloud.entry_id)).scalars().all()[-1] + 1
+        app.logger.info("administrative: (5a) patient counter updated to %s", app.config['entries'] - 1)
     db.session.commit()
