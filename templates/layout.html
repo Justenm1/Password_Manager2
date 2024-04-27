@@ -47,10 +47,10 @@
             <nav class="navbar bg-body-secondary navbar-expand-sm navbar-fixed-top rounded">
 
                 <!-- Left side logo -->
-                <a href="{{ url_for('index') }}" class="navbar-brand ms-4">Password Manager</a>
+                <a href="{{ url_for('index') }}" class="navbar-brand ms-4">Password Manager Home</a>
                 {% if session['logged_in'] %}
 
-                    <p class="text-body-secondary mb-0"><small>User: {{ session['username'] }} (Clearance: "{{ session['role'] }}")</small></p>
+                    <p class="text-body-secondary mb-0"><small>User: {{ session['username'] }}</small></p>
 
                 {% endif %}
 
