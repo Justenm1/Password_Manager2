@@ -30,11 +30,6 @@ def verify_pw(pw_hash, password):
     # create an argon2 hasher instance
     argon2 = PasswordHasher()
 
-    # check if the password needs to be rehashed
-    # this returns true if the instance's parameters change
-    if argon2.check_needs_rehash(pw_hash):
-        app.logger.info('WARNING: password needs to be rehashed')
-
     try:
         return argon2.verify(pw_hash, password)
     except VerifyMismatchError:
