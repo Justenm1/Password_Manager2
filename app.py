@@ -5,8 +5,9 @@ from socket import gethostname
 from flask import render_template, session, redirect, url_for, request, flash
 
 from modules.globals import app, db
-from modules.helpers import logged_in, create_session, verify_pw, hash_pw
+from modules.helpers import logged_in, create_session, verify_pw, hash_pw, passwordstrength
 from modules.db_Classes import Credentials, UserEntryCloud
+from modules.secrets import debug_mode
 
 
 @app.route('/')
@@ -27,7 +28,11 @@ def index():
     rolecheck = session['role']
 
     for entry in cloud_query:
-        entry.decrypt()
+        if session['role'] == 'H':
+            if entry.user_id == session['id']:
+                entry.decrypt()
+        elif entry.user_id == session['id']:
+            entry.decrypt()
 
     return render_template('index.html', rolecheck=rolecheck, session=session,
                            userentries=cloud_query)
@@ -110,6 +115,9 @@ def register():
             flash("Account already exists", "error")
         elif request.form['password1'] != request.form['password2']:
             flash("Passwords do not match", "error")
+        elif passwordstrength(request.form['password1']) <= 3:
+            flash("""Password is not strong enough. Try making the password 12 characters long with at least 
+            1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character.""", "error")
         else:
             user_id = db.session.execute(db.insert(Credentials).values(
                 username=request.form['username'],
@@ -155,4 +163,4 @@ def create_user_entry():
 if __name__ == '__main__':
     if 'liveconsole' not in gethostname():
         app.logger.info("administrative: (6) flask application ready, running...")
-        app.run(host='localhost', port=5000, debug=True)
+        app.run(host='localhost', port=5000, debug=debug_mode)
