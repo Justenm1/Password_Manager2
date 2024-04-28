@@ -1,8 +1,12 @@
+import math
+
 from flask import session
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 from modules.globals import app
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+import string
+
 
 def create_session(user_id, user, role):
     """ Create a session for the user
@@ -75,6 +79,7 @@ def encrypt(data, iv=None):
     """ encrypt data using AES in CBC mode with a 16 byte
         initialization vector. returns the ciphertext
     """
+    # use the flask secret key for the key
     from modules.secrets import key  # 32 bytes key
 
     # format the iv to a 16 byte string
@@ -104,28 +109,61 @@ def decrypt(data, iv):
     # use the flask secret for the secret key
     from modules.secrets import key
 
-    if session['role'] == 'H':
-        return data
-    else:
-        # create the iv from the patient tuple's patient_id
-        iv = mypad(str(iv).encode('utf-8'), 16, False)
+    # create the iv from the patient tuple's patient_id
+    iv = mypad(str(iv).encode('utf-8'), 16, False)
 
-        # create a cipher object using the key and iv
-        cipher = Cipher(algorithms.AES(key), modes.CBC(iv))
+    # create a cipher object using the key and iv
+    cipher = Cipher(algorithms.AES(key), modes.CBC(iv))
 
-        # create a decryptor object
-        decryptor = cipher.decryptor()
+    # create a decryptor object
+    decryptor = cipher.decryptor()
 
-        # decrypt the ciphertext
-        decipher_text = decryptor.update(data) + decryptor.finalize()
+    # decrypt the ciphertext
+    decipher_text = decryptor.update(data) + decryptor.finalize()
 
-        # remove the pad code block from the deciphered text
-        pad_block = decipher_text[-16:]  # get the pad code block
-        clear_text = decipher_text[:-16]  # remove the pad code block
+    # remove the pad code block from the deciphered text
+    pad_block = decipher_text[-16:]  # get the pad code block
+    clear_text = decipher_text[:-16]  # remove the pad code block
 
-        # remove the padding from the deciphered text using the pad code
-        pad_code = pad_block[-1] - ord("A")  # get the pad code
-        clear_text = clear_text[:-pad_code]  # remove the padding
+    # remove the padding from the deciphered text using the pad code
+    pad_code = pad_block[-1] - ord("A")  # get the pad code
+    clear_text = clear_text[:-pad_code]  # remove the padding
 
-        # return the deciphered text as a utf-8 string
-        return clear_text.decode("utf-8")
+    # return the deciphered text as a utf-8 string
+    return clear_text.decode("utf-8")
+
+def passwordstrength(password):
+
+    upper_case = any(c in string.ascii_uppercase for c in password)
+    lower_case = any(c in string.ascii_lowercase for c in password)
+    digits = any(c in string.digits for c in password)
+    special = any(c in string.punctuation for c in password)
+    length = len(password)
+
+    score = 0
+
+    if upper_case:
+        score += 26
+
+    if lower_case:
+        score += 26
+
+    if digits:
+        score += 10
+
+    if special:
+        score += 32
+
+    entropy = math.log2(score ** length)
+    if entropy >= 100:
+        result = 5
+    elif 75 <= entropy < 100:
+        result = 4
+    elif 50 <= entropy < 75:
+        result = 3
+    elif 25 <= entropy < 50:
+        result = 2
+    elif entropy < 25:
+        result = 1
+
+    return result

@@ -46,6 +46,13 @@
             <div class="invalid-feedback">Please re-enter the password</div>
         </div>
 
+        <div class="form-outline input-group mb-4">
+            <span class="input-group-text">Generated Password</span>
+            <input type="text" name="generated_password" class="form-control" id="generated_password" readonly/>
+        </div>
+    <button type="button" id="generatePasswordBtn" onclick="generatePassword()" class="btn btn-outline-primary">Generate Strong Password</button>
+    <span id="generatedPassword" class="mx-2"></span>
+
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             {% for category, message in messages %}
@@ -60,4 +67,29 @@
         <button type="submit" class="btn btn-outline-secondary">Register</button>
     </form>
 
+    <script>
+        function generatePassword() {
+            var length = 15;
+            var smallLetters = 'abcdefghijklmnopqrstuvwxyz';
+            var bigLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            var numbers = '0123456789';
+            var symbols = '@#$%=:?.|~>*()/';
+            var possibleCharacters = [smallLetters, bigLetters, numbers, symbols];
+
+            var randDigit = smallLetters.charAt(Math.floor(Math.random() * smallLetters.length));
+            var randSymbol = symbols.charAt(Math.floor(Math.random() * symbols.length));
+            var randSmallLetters = smallLetters.charAt(Math.floor(Math.random() * smallLetters.length));
+            var randBigLetters = bigLetters.charAt(Math.floor(Math.random() * bigLetters.length));
+
+            var tempPass = randDigit + randSymbol + randSmallLetters + randBigLetters;
+
+            for (var i = 0; i < length - 4; i++) {
+                var randomChar = possibleCharacters[Math.floor(Math.random() * possibleCharacters.length)];
+                tempPass += randomChar.charAt(Math.floor(Math.random() * randomChar.length));
+            }
+
+            var passwordInput = document.getElementById("generated_password");
+            passwordInput.value = tempPass;
+        }
+    </script>
 {% endblock %}
