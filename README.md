@@ -1,8 +1,9 @@
-Current Issues:
-1.	App.config[‘users’] is messing up a lot of things
-  a.	Creating new user password entries
-    i.	Having issues adding user_id to user entries to link user entry table back to credentials table for proper query to display only the logged in user’s entries
-    ii.	Issues handling app.config[‘users’] in both db_classes.py and app.py for addition of new entries
-  b.	Cannot create new users 
-    i.	App.config[‘users’] messing with this too.
-2. I think changing password that was meant to be stored as encrypted data from LargeBinary to a string is causing issues with the encryption.
+This is a web-base multi-user password manager that implements a few security features to allow users to security store their password from other sites. It uses Flask as a web frame and SQLAlchemy to handle database interactions with the server. Python is the primary language, but it also uses HTML and JavaScript to implement a easy to use front-end for the user.
+Security measures include:
+•	Password strength requirements
+  o	Strong password generator to aid in this requirement for user experience
+•	User profile password hashing
+•	SQLAlchemy proofing against SQL injection attacks
+•	User entry password AES256 encryption
+•	Role-based access control
+•	User authentication
